@@ -17,8 +17,8 @@ export const usePost = () => {
     queryFn: getPosts,
   });
 
-  // Query function for fetching a single post
-  const getPost = (id: number) => {
+  // Custom hook for fetching a single post
+  const useGetPost = (id: number) => {
     return useQuery({
       queryKey: ["post", id],
       queryFn: () => getPostById(id),
@@ -54,7 +54,7 @@ export const usePost = () => {
 
   return {
     posts,
-    getPost,
+    useGetPost,
     createPost: createPostMutation.mutate,
     updatePost: updatePostMutation.mutate,
     deletePost: deletePostMutation.mutate,

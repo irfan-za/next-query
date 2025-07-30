@@ -81,7 +81,7 @@ export default function DeletePostButton({
               </p>
               <div className="bg-gray-50 p-3 rounded-lg">
                 <p className="font-medium text-gray-900 truncate">
-                  "{postTitle}"
+                  &quot;{postTitle}&quot;
                 </p>
                 <p className="text-sm text-gray-600">Post ID: {postId}</p>
               </div>

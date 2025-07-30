@@ -13,8 +13,8 @@ export default function DetailPostPage() {
   const router = useRouter();
   const postId = parseInt(params.id as string);
 
-  const { getPost, updatePostMutation, deletePostMutation } = usePost();
-  const { data: post, isLoading, isError, error, refetch } = getPost(postId);
+  const { useGetPost, updatePostMutation, deletePostMutation } = usePost();
+  const { data: post, isLoading, isError, error, refetch } = useGetPost(postId);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -79,7 +79,7 @@ export default function DetailPostPage() {
               Post Not Found
             </h1>
             <p className="text-gray-600 mb-6">
-              The post you're looking for doesn't exist.
+              The post you&apos;re looking for doesn&apos;t exist.
             </p>
             <button
               onClick={() => router.push("/posts")}
