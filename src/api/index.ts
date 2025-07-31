@@ -12,10 +12,30 @@ interface PostsResponse {
   total_pages: number;
   total: number;
 }
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  gender: string;
+  status: string;
+}
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Authorization: `Bearer ${process.env.NEXT_PUBLIC_TOKEN}`,
+  },
 });
+const getUsers = async (): Promise<User[]> => {
+  try {
+    const response = await api.get("/users");
+    return response.data;
+  } catch (error) {
+    throw new Error("Failed to fetch users");
+  }
+};
 
 const getPosts = async (
   page: number,
@@ -53,8 +73,10 @@ const getPostById = async (id: number): Promise<Post> => {
 const createPost = async (newPost: Omit<Post, "id">): Promise<Post> => {
   try {
     const response = await api.post("/posts", newPost);
+    console.log(response, "🔥🔥🔥");
     return response.data;
   } catch (error) {
+    console.log(error, "🔥");
     throw new Error("Failed to create post");
   }
 };
@@ -76,4 +98,4 @@ const deletePost = async (id: number): Promise<void> => {
   }
 };
 
-export { getPosts, getPostById, createPost, updatePost, deletePost };
+export { getUsers, getPosts, getPostById, createPost, updatePost, deletePost };

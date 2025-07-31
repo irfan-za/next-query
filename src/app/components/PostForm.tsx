@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Post, PostCreateInput, PostUpdateInput } from "@/types/post";
+import { useUser } from "@/hooks/useUser";
 
 interface PostFormProps {
   post?: Post;
@@ -24,6 +25,7 @@ export default function PostForm({
     title: post?.title || "",
     body: post?.body || "",
   });
+  const { users } = useUser();
 
   useEffect(() => {
     if (post) {
@@ -48,7 +50,9 @@ export default function PostForm({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -95,19 +99,25 @@ export default function PostForm({
             htmlFor="user_id"
             className="block text-sm font-medium text-gray-700 mb-2"
           >
-            User ID
+            User
           </label>
-          <input
-            type="number"
+          <select
             id="user_id"
             name="user_id"
             value={formData.user_id}
             onChange={handleChange}
-            min="1"
             required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-            placeholder="Enter user ID"
-          />
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+          >
+            <option value="" disabled>
+              Select a user
+            </option>
+            {users.data?.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>

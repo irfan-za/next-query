@@ -130,16 +130,32 @@ export default function Posts() {
 
       <div className="bg-white shadow rounded-lg p-6 mt-12">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-gray-600">
-            Total Posts:{" "}
-            <span className="font-semibold">{posts.data?.total || 0}</span>
-            {posts.data?.total && (
-              <span className="text-sm ml-2">
-                (Page {posts.data.page} of {posts.data.total_pages || 1})
-              </span>
-            )}
-          </p>
-
+          <div className="flex items-center space-x-2">
+            <p className="text-gray-600 ">
+              Total Posts:{" "}
+              <span className="font-semibold">{posts.data?.total || 0}</span>
+              {posts.data?.total && (
+                <span className="text-sm ml-2">
+                  (Page {posts.data.page} of {posts.data.total_pages || 1})
+                </span>
+              )}
+            </p>
+            <select
+              value={perPage}
+              onChange={(e) => {
+                const newPerPage = Number(e.target.value);
+                router.replace(
+                  `?page=${page}&per_page=${newPerPage}&title=${title}`
+                );
+              }}
+              className="  w-fit bg-white border border-gray-300 text-gray-600 py-1 px-2 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          </div>
           {posts.data?.total && posts.data.total > perPage && (
             <div className="flex items-center gap-2">
               <Link
