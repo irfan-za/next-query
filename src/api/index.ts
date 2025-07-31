@@ -6,15 +6,36 @@ interface Post {
   title: string;
   body: string;
 }
+interface PostsResponse {
+  data: Post[];
+  page: number;
+  total_pages: number;
+  total: number;
+}
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
-const getPosts = async (): Promise<Post[]> => {
+const getPosts = async (
+  page: number,
+  perPage: number,
+  title: string
+): Promise<PostsResponse> => {
   try {
-    const response = await api.get("/posts");
-    return response.data;
+    const response = await api.get("/posts", {
+      params: {
+        page,
+        per_page: perPage,
+        title,
+      },
+    });
+    return {
+      data: response.data,
+      page: response.headers["x-pagination-page"],
+      total_pages: response.headers["x-pagination-pages"],
+      total: response.headers["x-pagination-total"],
+    };
   } catch (error) {
     throw new Error("Failed to fetch posts");
   }

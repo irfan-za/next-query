@@ -12,10 +12,12 @@ export const usePost = () => {
   const queryClient = useQueryClient();
 
   // Query for fetching all posts
-  const posts = useQuery({
-    queryKey: ["posts"],
-    queryFn: getPosts,
-  });
+  const useGetPosts = (page: number, perPage: number, title: string) => {
+    return useQuery({
+      queryKey: ["posts", { page, perPage, title }],
+      queryFn: () => getPosts(page, perPage, title),
+    });
+  };
 
   // Custom hook for fetching a single post
   const useGetPost = (id: number) => {
@@ -53,7 +55,7 @@ export const usePost = () => {
   });
 
   return {
-    posts,
+    useGetPosts,
     useGetPost,
     createPost: createPostMutation.mutate,
     updatePost: updatePostMutation.mutate,

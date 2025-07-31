@@ -4,9 +4,24 @@ import { usePost } from "@/hooks/usePost";
 import PostCard from "./PostCard";
 import LoadingCard from "./LoadingCard";
 import ErrorCard from "./ErrorCard";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Posts() {
-  const { posts } = usePost();
+  const searchParams = useSearchParams();
+
+  const page = Number(searchParams.get("page")) || 1;
+  const perPage = Number(searchParams.get("per_page")) || 10;
+  const title = searchParams.get("title") || "";
+  const router = useRouter();
+
+  const postsQuery = usePost();
+  const posts = postsQuery.useGetPosts(page, perPage, title);
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const title = event.target.value;
+    setTimeout(() => {
+      router.replace(`?page=${page}&per_page=${perPage}&title=${title}`);
+    }, 500);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4">
@@ -37,6 +52,12 @@ export default function Posts() {
             </svg>
             Create New Post
           </Link>
+          <input
+            placeholder="Search posts..."
+            className="mt-4 p-2 border border-gray-300 rounded-md block mx-auto max-w-96 w-full"
+            defaultValue={title}
+            onChange={handleSearch}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -51,9 +72,11 @@ export default function Posts() {
                 onRetry={() => posts.refetch()}
               />
             </div>
-          ) : posts.data && posts.data.length > 0 ? (
+          ) : posts.data && posts.data.data.length > 0 ? (
             // Success state - show post cards
-            posts.data.map((post) => <PostCard key={post.id} post={post} />)
+            posts.data.data.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))
           ) : (
             // Empty state
             <div className="col-span-full">
@@ -100,6 +123,75 @@ export default function Posts() {
                   Create First Post
                 </Link>
               </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="bg-white shadow rounded-lg p-6 mt-12">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-gray-600">
+            Total Posts:{" "}
+            <span className="font-semibold">{posts.data?.total || 0}</span>
+            {posts.data?.total && (
+              <span className="text-sm ml-2">
+                (Page {posts.data.page} of {posts.data.total_pages || 1})
+              </span>
+            )}
+          </p>
+
+          {posts.data?.total && posts.data.total > perPage && (
+            <div className="flex items-center gap-2">
+              <Link
+                href={`?page=${Math.max(
+                  Number(page) - 1,
+                  1
+                )}&per_page=${perPage}`}
+                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </Link>
+
+              <div className="flex items-center gap-1">
+                {Array.from(
+                  { length: posts.data.total_pages || 1 },
+                  (_, i) => i + 1
+                )
+                  .filter((p) => {
+                    const totalPages = posts.data.total_pages;
+                    if (totalPages <= 7) return true;
+                    if (p === 1 || p === totalPages) return true;
+                    if (p >= page - 1 && p <= page + 1) return true;
+                    return false;
+                  })
+                  .map((p, index, filteredPages) => (
+                    <div key={p} className="flex items-center">
+                      {index > 0 && filteredPages[index - 1] !== p - 1 && (
+                        <span className="px-2 text-gray-400">...</span>
+                      )}
+                      <Link
+                        href={`?page=${p}&per_page=${perPage}`}
+                        className={`px-3 py-2 text-sm font-medium rounded-md ${
+                          page === p
+                            ? "bg-blue-600 text-white"
+                            : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        {p}
+                      </Link>
+                    </div>
+                  ))}
+              </div>
+
+              <Link
+                href={`?page=${Math.min(
+                  Number(page) + 1,
+                  posts.data.total_pages || 1
+                )}&per_page=${perPage}`}
+                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </Link>
             </div>
           )}
         </div>
