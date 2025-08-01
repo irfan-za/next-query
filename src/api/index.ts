@@ -1,11 +1,6 @@
+import { Post } from "@/types/post";
 import axios from "axios";
 
-interface Post {
-  id: number;
-  user_id: number;
-  title: string;
-  body: string;
-}
 interface PostsResponse {
   data: Post[];
   page: number;
@@ -73,10 +68,8 @@ const getPostById = async (id: number): Promise<Post> => {
 const createPost = async (newPost: Omit<Post, "id">): Promise<Post> => {
   try {
     const response = await api.post("/posts", newPost);
-    console.log(response, "🔥🔥🔥");
     return response.data;
   } catch (error) {
-    console.log(error, "🔥");
     throw new Error("Failed to create post");
   }
 };

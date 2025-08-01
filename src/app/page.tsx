@@ -1,13 +1,12 @@
 import Link from "next/dist/client/link";
-import Posts from "./components/Posts";
 
 export default function Home() {
   return (
-    <div>
-      Home page
-      <Link href="/posts" className="text-blue-500 hover:underline">
-        see all posts
-      </Link>
+    <div className="flex flex-col min-h-dvh justify-center items-center">
+      <h1 className="text-2xl font-bold mb-4">Ready to see the example?</h1>
+      <button className="bg-blue-500 text-white px-4 py-2 rounded-lg">
+        <Link href="/posts">Get Started</Link>
+      </button>
     </div>
   );
 }

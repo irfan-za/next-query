@@ -5,6 +5,7 @@ import PostCard from "./PostCard";
 import LoadingCard from "./LoadingCard";
 import ErrorCard from "./ErrorCard";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Posts() {
   const searchParams = useSearchParams();
@@ -16,6 +17,20 @@ export default function Posts() {
 
   const postsQuery = usePost();
   const posts = postsQuery.useGetPosts(page, perPage, title);
+  const { prefetchAdjacent } = postsQuery.usePrefetchAdjacentPages(
+    page,
+    perPage,
+    title,
+    posts.data?.total_pages
+  );
+
+  // (Optional) Prefetch adjacent pages when current page or data changes
+  useEffect(() => {
+    if (posts.data && !posts.isLoading) {
+      prefetchAdjacent();
+    }
+  }, [page, perPage, title]);
+
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const title = event.target.value;
     setTimeout(() => {

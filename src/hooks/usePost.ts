@@ -18,6 +18,45 @@ export const usePost = () => {
       queryFn: () => getPosts(page, perPage, title),
     });
   };
+  // (Optional) Prefetch posts for a specific page
+  const usePrefetchPosts = (page: number, perPage: number, title: string) => {
+    return queryClient.prefetchQuery({
+      queryKey: ["posts", { page, perPage, title }],
+      queryFn: () => getPosts(page, perPage, title),
+    });
+  };
+
+  // Prefetch adjacent pages based on current page
+  const usePrefetchAdjacentPages = (
+    currentPage: number,
+    perPage: number,
+    title: string,
+    totalPages?: number
+  ) => {
+    const prefetchPage = (page: number) => {
+      if (page > 0 && (!totalPages || page <= totalPages)) {
+        queryClient.prefetchQuery({
+          queryKey: ["posts", { page, perPage, title }],
+          queryFn: () => getPosts(page, perPage, title),
+          staleTime: 5 * 60 * 1000, // Keep prefetched data fresh for 5 minutes
+        });
+      }
+    };
+
+    return {
+      prefetchAdjacent: () => {
+        if (currentPage === 1) {
+          // On first page, prefetch pages 2 and 3
+          prefetchPage(2);
+          prefetchPage(3);
+        } else {
+          // On any other page, prefetch previous and next pages
+          prefetchPage(currentPage - 1);
+          prefetchPage(currentPage + 1);
+        }
+      },
+    };
+  };
 
   // Custom hook for fetching a single post
   const useGetPost = (id: number) => {
@@ -56,6 +95,8 @@ export const usePost = () => {
 
   return {
     useGetPosts,
+    usePrefetchPosts,
+    usePrefetchAdjacentPages,
     useGetPost,
     createPost: createPostMutation.mutate,
     updatePost: updatePostMutation.mutate,
